@@ -89,14 +89,6 @@ def solve(n, m, libros):
         outputs[n-1] = m
         while 0 < m:
             if matrix[n][m-1] < matrix[n-1][m-1]:
-                if n == 2 and m == 3 and matrix[n][m-1] != matrix[n][m-2]:
-                    outputs[n-2] = m - 1
-                    inputs[n-1] = m
-                    n = n - 1
-                elif m == 2 and n == 2:
-                    outputs[n-2] = m - 1
-                    inputs[n-1] = m
-                    n = n - 1
                 m = m - 1
             else:
                 outputs[n-2] = m - 1
