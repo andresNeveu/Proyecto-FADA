@@ -11,7 +11,6 @@ public class PuntoA {
     static String ARCHIVO_LECTURA = "inA";
     static String ARCHIVO_ESCRITURA = "outA";
     static double suma = 0.0;
-    static int iteration = 0;
 
     /*
      * Método para realizar la lectura del problema, no modificar.
@@ -96,16 +95,20 @@ public class PuntoA {
 
         // inicializar la matriz O(m)
         for (int i = 0; i <= totalHoras; i++) {
+            //System.out.println("i " + i);
             tmax[0][i] = 0;
             matrizProcedimientos[0][i] = new ArrayList<>();
         }
-
+        int contadorCheck = 0;
         // Complejidad n x totalHoras
         for (int i = 1; i <= n; i++) {
+            //System.out.println("j: " + i);
             for (int j = 0; j <= totalHoras; j++) {
-
+                
+                
                 int horasProc = hourProc(procedimientos[i - 1]);
                 double minutosProc = minutesProc(procedimientos[i - 1]);
+                horasProc += minutosProc / 60;
 
                 // no tomar el item, restamos 1 a la cantidad total de items
                 tmax[i][j] = tmax[i - 1][j];
@@ -113,25 +116,23 @@ public class PuntoA {
                 ArrayList<Procedimiento> procNoTomar = (ArrayList<Procedimiento>) matrizProcedimientos[i - 1][j].clone();
                 matrizProcedimientos[i][j] = procNoTomar;
 
-                if ((j >= horasProc) && (tmax[i - 1][j - horasProc] + (horasProc + minutosProc) > tmax[i][j])) {
+                if ((j >= horasProc) && (tmax[i - 1][j - horasProc] + horasProc > tmax[i][j])) {
 
                     ArrayList<Procedimiento> procTomarlo = (ArrayList<Procedimiento>) matrizProcedimientos[i - 1][j - horasProc].clone();
-
+                    contadorCheck++;
                     if (!(checkCrossing(procTomarlo, procedimientos[i - 1]))) {
-                        if ((j >= (suma + horasProc + minutosProc))) {
+                        if ((j >= (suma + horasProc))) {
                             tmax[i][j] = tmax[i - 1][j - horasProc] + horasProc;
                             procTomarlo.add(procedimientos[i - 1]);
                             matrizProcedimientos[i][j] = (ArrayList<Procedimiento>) procTomarlo.clone();
                         }
-                    }
-                    else {
-                        if(tmax[i][j - 1] > tmax[i - 1][j - horasProc]) {
+                    } else {
+                        if (tmax[i][j - 1] > tmax[i - 1][j - horasProc]) {
                             tmax[i][j] = tmax[i][j - 1];
                             matrizProcedimientos[i][j] = (ArrayList<Procedimiento>) matrizProcedimientos[i][j - 1].clone();
                         }
-                     }
+                    }
                 }
-                iteration++;
                 System.out.print(tmax[i][j] + "\t");
             }
             System.out.print("\n");
@@ -156,8 +157,9 @@ public class PuntoA {
 
     public static boolean checkCrossing(ArrayList<Procedimiento> procs, Procedimiento currentProc) {
         suma = 0;
+        int horas = 0, minutos = 0;
         for (Procedimiento proc : procs) {
-            if ((currentProc.horaInicio.equals(proc.horaInicio.hora))) {
+            if ((currentProc.horaInicio.equals(proc.horaInicio))) {
                 return true;
             } else if ((currentProc.horaInicio.hora == proc.horaFin.hora)
                     && (proc.horaFin.minutos > currentProc.horaInicio.minutos)) {
@@ -165,9 +167,11 @@ public class PuntoA {
             } else if ((proc.horaFin.hora > currentProc.horaInicio.hora)) {
                 return true;
             }
-            iteration++;
-            suma += (hourProc(proc) + minutesProc(proc));
+            horas += hourProc(proc);
+            minutos += minutesProc(proc);
         }
+        horas += minutos / 60;
+        suma = horas;
         return false;
     }
 
