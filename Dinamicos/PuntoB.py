@@ -24,7 +24,6 @@ class Libro():
     def __init__(self, nombre, paginas):
         self.nombre = nombre
         self.paginas = paginas
-        
 
 
 def input():
@@ -67,46 +66,48 @@ def output(obj):
 
 
 def solve(n, m, libros):
-
+    
     inputs = np.zeros(n, int)
     outputs = np.zeros(n, int)
-    matrix = np.full((n+1, m+1), np.Infinity)
+    matrix = np.full((n+1, m), np.Infinity)
 
-    def mapMatrix(n, m, sum, maxsum):
-        if m == 0:
-            matrix[n][0] = maxsum if maxsum < matrix[n][0] else matrix[n][0]
-            if n == 1:
-                matrix[0][0] = matrix[n][0]
-            return maxsum
-
-        if n == 0:
-            matrix[0][m] = np.Infinity
-            return np.Infinity
-
-        sum = sum + libros[m-1].paginas
-        result = min(mapMatrix(n-1, m, 0, maxsum),
-                     (mapMatrix(n, m-1, sum, sum if sum > maxsum else maxsum)))
-        matrix[n][m] = result if result < matrix[n][m] else matrix[n][m]
-
-        return result
+    def mapMatrix(n, m, books):
+        n = min(n, m)
+        for i in range(1, m):
+            books[i] += books[i - 1]
+        for i in range(1, n + 1):
+            for j in range(m):
+                if i == 1 or j == 0:
+                    matrix[i][j] = books[j]
+                else:
+                    for k in range(j-1, -1, -1):
+                        num = max(matrix[i-1][k], books[j] - books[k])
+                        matrix[i][j] = min(matrix[i][j], num)
+        return matrix[n][m-1]
 
     def writers(n, m):
+        outputs[n-1] = m
         while 0 < m:
-            if m + 1 == matrix[0].size:
-                outputs[n-1] = m
-
-            if matrix[n-1][m] < matrix[n][m-1]:
-                inputs[n-1] = m + 1
-                outputs[n-2] = m
-                n = n - 1
-
-            else:
+            if matrix[n][m-1] < matrix[n-1][m-1]:
+                if n == 2 and m == 3 and matrix[n][m-1] != matrix[n][m-2]:
+                    outputs[n-2] = m - 1
+                    inputs[n-1] = m
+                    n = n - 1
+                elif m == 2 and n == 2:
+                    outputs[n-2] = m - 1
+                    inputs[n-1] = m
+                    n = n - 1
                 m = m - 1
-
-        inputs[n-1] = 1
+            else:
+                outputs[n-2] = m - 1
+                inputs[n-1] = m
+                n = n - 1
+                m = m - 1
+        inputs[n-1] = 1 if inputs[n] != 1 else 0
+    newBooks = [i.paginas for i in libros]
+    result = int (mapMatrix(n, m, newBooks))
     inputs = inputs.astype(str)
     outputs = outputs.astype(str)
-    result = mapMatrix(n, m, 0, 0)
     writers(n, m)
     return Respuesta(result, inputs, outputs)
 
