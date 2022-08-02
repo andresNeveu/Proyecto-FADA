@@ -21,7 +21,7 @@ public class PuntoA {
         BufferedReader br = null;
         Procedimiento[] p = null;
         try {
-            archivo = new File(ARCHIVO_LECTURA + ".txt");
+            archivo = new File("Dinamicos/" + ARCHIVO_LECTURA + ".txt");
             fr = new FileReader(archivo);
             br = new BufferedReader(fr);
             int n = Integer.parseInt(br.readLine());
@@ -60,7 +60,7 @@ public class PuntoA {
         FileWriter fichero = null;
         PrintWriter pw = null;
         try {
-            fichero = new FileWriter(ARCHIVO_ESCRITURA + ".txt");
+            fichero = new FileWriter("Dinamicos/" + ARCHIVO_ESCRITURA + ".txt");
             pw = new PrintWriter(fichero);
 
             pw.println(output.n);
@@ -99,7 +99,7 @@ public class PuntoA {
             tmax[0][i] = 0;
             matrizProcedimientos[0][i] = new ArrayList<>();
         }
-        int contadorCheck = 0;
+
         // Complejidad n x totalHoras
         for (int i = 1; i <= n; i++) {
             //System.out.println("j: " + i);
@@ -119,7 +119,7 @@ public class PuntoA {
                 if ((j >= horasProc) && (tmax[i - 1][j - horasProc] + horasProc > tmax[i][j])) {
 
                     ArrayList<Procedimiento> procTomarlo = (ArrayList<Procedimiento>) matrizProcedimientos[i - 1][j - horasProc].clone();
-                    contadorCheck++;
+
                     if (!(checkCrossing(procTomarlo, procedimientos[i - 1]))) {
                         if ((j >= (suma + horasProc))) {
                             tmax[i][j] = tmax[i - 1][j - horasProc] + horasProc;
